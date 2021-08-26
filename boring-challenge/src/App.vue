@@ -6,7 +6,7 @@
           <b-card no-body>
             <b-tabs card>
               <b-tab title="Home" active>
-                This is home
+                <tab-home/>
               </b-tab>
               <b-tab title="Filters">
                 This is with filters
@@ -22,9 +22,12 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import TabHome from './components/TabHome.vue'
+
 export default Vue.extend({
   name: 'App',
   components: {
+    TabHome,
   }
 });
 </script>
