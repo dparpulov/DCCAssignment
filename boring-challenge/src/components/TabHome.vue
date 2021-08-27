@@ -1,7 +1,7 @@
 <template>
 	<b-card-text>
 		<div class="d-flex justify-content-center border border-dark">	
-			<h5 class="font-weight-bold">You should {{activity.activity}}</h5>			
+			<h5 class="font-weight-bold" style="margin:0px; padding:8px">You should {{activity.activity}}</h5>			
 		</div>
 		<p class="text-capitalize">Type: {{activity.type}}</p>
 		<p>

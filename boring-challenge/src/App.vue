@@ -17,7 +17,7 @@
                     </b-col>
                     <b-col>
                       <activity-filters v-on:childToParent="onFilterChange"/>
-                      <div class="d-flex justify-content-center">
+                      <div class="d-flex justify-content-center pt-2">
                         <b-button pill variant="primary" size="lg" @click="getFilteredActivity()">Show me something specific!</b-button>
                       </div>
                     </b-col>
@@ -78,10 +78,10 @@ export default Vue.extend({
         params: {
           type: this.fromChild[0],
           participants: this.fromChild[1],
-          minprice: 0,
-          maxprice: this.fromChild[2],
-          minaccessibility: 0,
-          maxaccessibility: this.fromChild[3],
+          minprice: this.fromChild[2],
+          maxprice: this.fromChild[3],
+          minaccessibility: this.fromChild[4],
+          maxaccessibility: this.fromChild[5],
         }
       })
       .then((response) => (this.activity = response.data))
