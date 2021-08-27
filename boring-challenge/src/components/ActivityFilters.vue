@@ -17,7 +17,7 @@
 						<label for="participantsFilter">Participants</label>
 						<b-form-input class="border-dark" type="number" min="0" max="8" v-model="participants" v-on:change="emitToParent"></b-form-input>
 					</div>
-					<label for="priceFilter">Max. Budget: {{maxPrice}}</label>
+					<label for="priceFilter">Budget range: {{maxPrice}}</label>
 					<div>
 						<vue-slider v-model="minMaxPrice" :enable-cross="false" :min="0" :max="1" interval="0.05" v-on:change="emitToParent"></vue-slider>
 						<b-row>
@@ -30,7 +30,7 @@
 						</b-row>
 
 					</div>
-					<label for="accessibilityFilter">Max. Difficulty: {{maxAccessibility}}</label>
+					<label for="accessibilityFilter">Difficulty range: {{maxAccessibility}}</label>
 					<div>
 						<vue-slider v-model="minMaxAccessibility" :enable-cross="false" :min="0" :max="1" interval="0.1" v-on:change="emitToParent"></vue-slider>
 						<b-row>
