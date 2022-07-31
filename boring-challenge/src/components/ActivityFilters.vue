@@ -3,35 +3,34 @@
     <h4>Filters</h4>
     <b-row>
       <b-col>
-        <label for="typeFilter">Type</label>
+        <label class="mb-1" for="typeFilter">Type</label>
         <b-form-select
           id="typeFilter"
-          class="rounded border-dark w-100 mb-1"
-          style="padding: 6px 12px"
+          class="rounded border-dark w-100 mb-3 px-1 py-2"
           v-model="selectedType"
           :options="types"
-          v-on:change="emitToParent"
+          @change="emitToParent"
         />
-        <label for="participantsFilter">Participants</label>
+        <label class="mb-1" for="participantsFilter">Participants</label>
         <b-form-input
           id="participantsFilter"
-          class="border-dark mb-1"
+          class="border-dark mb-3"
           type="number"
           min="0"
           max="8"
           v-model="participants"
-          v-on:change="emitToParent"
+          @change="emitToParent"
         />
-        <label for="priceFilter">Budget range:</label>
+        <label class="mb-1" for="priceFilter">Budget range:</label>
         <vue-slider
           v-model="minMaxPrice"
           :enable-cross="false"
           :min="min"
           :max="max"
           :interval="intervalPrice"
-          v-on:change="emitToParent"
+          @change="emitToParent"
         />
-        <b-row>
+        <b-row class="mb-3">
           <b-col>
             <label for="minPrice">{{ minMaxPrice[0] }}</label>
           </b-col>
@@ -39,8 +38,7 @@
             <label for="maxPrice">{{ minMaxPrice[1] }}</label>
           </b-col>
         </b-row>
-        {{ filters }}
-        <label for="accessibilityFilter">
+        <label class="mb-1" for="accessibilityFilter">
           Difficulty range: {{ minMaxAccessibility[0] }} -
           {{ minMaxAccessibility[1] }}
         </label>
@@ -50,7 +48,8 @@
           :min="min"
           :max="max"
           :interval="intervalAccessibility"
-          v-on:change="emitToParent"
+          class="mb-3"
+          @change="emitToParent"
         />
       </b-col>
     </b-row>
@@ -59,50 +58,65 @@
 
 <script lang="ts">
 import Vue from "vue";
+import VueCompositionAPI from '@vue/composition-api'
+Vue.use(VueCompositionAPI)
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/antd.css";
+import { defineComponent, ref, onMounted } from "@vue/composition-api";
 
-export default Vue.extend({
+export default defineComponent({
   components: {
     VueSlider,
   },
-  data() {
+  setup(props,{ emit }) {
+    const types = ref([
+      { value: "", text: "All" },
+      { value: "education", text: "Education" },
+      { value: "recreational", text: "Recreational" },
+      { value: "social", text: "Social" },
+      { value: "diy", text: "DIY" },
+      { value: "charity", text: "Charity" },
+      { value: "cooking", text: "Cooking" },
+      { value: "relaxation", text: "Relaxation" },
+      { value: "music", text: "Music" },
+      { value: "busywork", text: "Busywork" },
+    ])
+    const selectedType = ref("");
+    const participants = ref(1);
+    const min = ref(0);
+    const max = ref(1);
+    const intervalPrice = ref(0.05);
+    const intervalAccessibility = ref(0.1);
+    const minMaxPrice = ref([0, 1]);
+    const minMaxAccessibility = ref([0, 1]);
+
+    function emitToParent() {
+      emit("childToParent", {
+        type: selectedType.value,
+        participants: participants.value,
+        minPrice: minMaxPrice.value[0],
+        maxPrice: minMaxPrice.value[1],
+        minAccessibility: minMaxAccessibility.value[0],
+        maxAccessibility: minMaxAccessibility.value[1],
+      });
+    }
+
+    onMounted(() => {
+      emitToParent()
+    })
+
     return {
-      types: [
-        { value: "education", text: "Education" },
-        { value: "recreational", text: "Recreational" },
-        { value: "social", text: "Social" },
-        { value: "diy", text: "DIY" },
-        { value: "charity", text: "Charity" },
-        { value: "cooking", text: "Cooking" },
-        { value: "relaxation", text: "Relaxation" },
-        { value: "music", text: "Music" },
-        { value: "busywork", text: "Busywork" },
-      ],
-      selectedType: "",
-      participants: "",
-      min: 0,
-      max: 1,
-      intervalPrice: 0.05,
-      intervalAccessibility: 0.1,
-      minMaxPrice: [0, 1],
-      minMaxAccessibility: [0, 1],
-      filters: [{}],
-    };
-  },
-  computed: {},
-  methods: {
-    emitToParent() {
-      this.filters = [
-        this.selectedType,
-        this.participants,
-        this.minMaxPrice[0],
-        this.minMaxPrice[1],
-        this.minMaxAccessibility[0],
-        this.minMaxAccessibility[1],
-      ];
-      this.$emit("childToParent", this.filters);
-    },
+      types,
+      selectedType,
+      participants,
+      min,
+      max,
+      intervalPrice,
+      intervalAccessibility,
+      minMaxPrice,
+      minMaxAccessibility,
+      emitToParent,
+    }
   },
 });
 </script>

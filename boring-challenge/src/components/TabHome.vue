@@ -1,24 +1,21 @@
 <template>
   <b-card-text>
-    <div class="d-flex justify-content-center border border-dark">
-      <h5 class="font-weight-bold m-0 p-2" style="min-height: 5rem;">
-        You should {{ activity.activity }}
+    <div class="d-flex justify-content-center align-items-center border border-dark mb-3">
+      <h5 class="font-weight-bold m-0 p-2 text-center" style="min-height: 5rem;">
+        {{ activity.activity }}
       </h5>
     </div>
     <p class="text-capitalize">Type: {{ activity.type }}</p>
     <p>
-      <b-icon-person-fill v-if="activity.participants == 1" />
-      <b-icon-people-fill v-else-if="activity.participants > 1" />
-      <span v-if="activity.participants == 1">
+      <b-icon-person-fill v-if="activity.participants === 1" />
+      <b-icon-people-fill v-else-if="activity.participants > 1" class="mx-2" />
+      <span v-if="activity.participants === 1">
         {{ activity.participants }} participant
       </span>
       <span v-else>{{ activity.participants }} participants </span>
     </p>
     <p>
-      <label for="price" v-if="activity.price == 0">Price: Free</label>
-      <label for="price" v-else-if="activity.price <= 0.3">Price: Low</label>
-      <label for="price" v-else-if="activity.price <= 0.6">Price: Medium</label>
-      <label for="price" v-else-if="activity.price <= 1">Price: High</label>
+      <label for="price">Price: {{ getPriceString() }}</label>
       <b-progress
         id="price"
         :value="activity.price"
@@ -29,37 +26,17 @@
     </p>
     <p>
       Visit at:
-      <a v-if="activity.link != ''" :href="activity.link">
-        {{ activity.link }}
-      </a>
-      <a v-else>
-        N/A
+      <a :href="activity.link ? activity.link : undefined">
+        {{ activity.link ? activity.link : "N/A" }}
       </a>
     </p>
-    <label for="accessibility" v-if="activity.accessibility <= 0.3">
-      Difficulty: Easy
-    </label>
-    <label for="accessibility" v-else-if="activity.accessibility <= 0.6">
-      Difficulty: Medium
-    </label>
-    <label for="accessibility" v-else-if="activity.accessibility <= 1">
-      Difficulty: Hard
+    <label for="accessibility">
+      Difficulty: {{ getDifficultyString() }}
     </label>
     <b-progress id="accessibility" :max="max" show-progress animated>
       <b-progress-bar
         :value="activity.accessibility"
-        v-if="activity.accessibility <= 0.3"
-        variant="success"
-      />
-      <b-progress-bar
-        :value="activity.accessibility"
-        v-else-if="activity.accessibility <= 0.6"
-        variant="warning"
-      />
-      <b-progress-bar
-        :value="activity.accessibility"
-        v-else-if="activity.accessibility <= 1"
-        variant="danger"
+        :variant="getAccessibilityVariant()"
       />
     </b-progress>
   </b-card-text>
@@ -67,18 +44,52 @@
 
 <script lang="ts">
 import Vue from "vue";
+import VueCompositionAPI from '@vue/composition-api'
+import { defineComponent, ref } from '@vue/composition-api'
+import {Activity} from "@/Types/types";
+Vue.use(VueCompositionAPI)
 
-export default Vue.extend({
+export default defineComponent({
   props: {
-    activity: [Array, Object],
-    previousActivity: [Array, Object],
+    activity: {
+      type: Object as () => Activity,
+      required: true,
+    },
   },
-  data() {
+  setup(props) {
+    const max = ref(1)
+
+    function getPriceString(): string {
+      if (props.activity.price == 0) return 'Free'
+      if (props.activity.price <= 0.3) return 'Low'
+      if (props.activity.price <= 0.6) return 'Medium'
+      return 'High'
+    }
+
+    function getDifficultyString(): string {
+      if (props.activity.accessibility <= 0.3) return 'Easy'
+
+      if (props.activity.accessibility <= 0.6) return 'Medium'
+
+      return 'Hard'
+    }
+
+    function getAccessibilityVariant(): string {
+      if (props.activity.accessibility <= 0.3) return 'success'
+
+      if (props.activity.accessibility <= 0.6) return 'warning'
+
+      return 'danger'
+    }
+
     return {
-      max: 1,
-    };
-  },
-});
+      max,
+      getPriceString,
+      getDifficultyString,
+      getAccessibilityVariant,
+    }
+  }
+})
 </script>
 
 <style scoped></style>

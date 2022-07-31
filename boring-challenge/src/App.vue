@@ -6,7 +6,7 @@
           <b-tab title="Home" active>
             <b-row>
               <b-col>
-                <tab-home
+                <TabHome
                   :activity="activity"
                   :previousActivity="previousActivity"
                 />
@@ -14,7 +14,7 @@
                   pill
                   variant="outline-primary"
                   size="sm"
-                  @click="getPreviousActivity()"
+                  @click="getPreviousActivity"
                 >
                   Get previous activity
                 </b-button>
@@ -23,20 +23,20 @@
                     pill
                     variant="primary"
                     size="lg"
-                    @click="getActivity()"
+                    @click="getActivity"
                   >
                     I'm bored!
                   </b-button>
                 </div>
               </b-col>
               <b-col class="d-flex flex-column">
-                <activity-filters v-on:childToParent="onFilterChange" />
+                <ActivityFilters @childToParent="handleFilterChange" />
                 <b-button
                   pill
                   variant="primary"
                   size="lg"
-                  @click="getFilteredActivity()"
                   class="mt-auto mx-auto w-75 "
+                  @click="getFilteredActivity"
                 >
                   Show me something specific!
                 </b-button>
@@ -44,7 +44,7 @@
             </b-row>
           </b-tab>
           <b-tab title="Saved">
-            <saved-activities />
+            <SavedActivities />
           </b-tab>
         </b-tabs>
       </b-card>
@@ -55,60 +55,72 @@
 <script lang="ts">
 import Vue from "vue";
 import axios from "axios";
+import VueCompositionAPI, { defineComponent, ref, onMounted } from '@vue/composition-api'
+Vue.use(VueCompositionAPI)
 
 import TabHome from "./components/TabHome.vue";
 import ActivityFilters from "./components/ActivityFilters.vue";
 import SavedActivities from "./components/SavedActivities.vue";
+import {Filters} from "@/Types/types";
 
-export default Vue.extend({
-  name: "App",
+
+export default defineComponent({
   components: {
     TabHome,
     ActivityFilters,
     SavedActivities,
   },
-  data() {
-    return {
-      activity: [],
-      previousActivity: [],
-      fromChild: [],
-    };
-  },
-  mounted() {
-    this.getActivity();
-  },
-  methods: {
-    getActivity() {
-      this.previousActivity = this.activity;
+  setup() {
+    const activity = ref({});
+    const previousActivity = ref({});
+    const filters = ref();
+
+    const BASE_URL = "http://www.boredapi.com/api/activity/";
+
+    function getActivity() {
+      previousActivity.value = activity.value;
       axios
-        .get("http://www.boredapi.com/api/activity/")
-        .then((response) => (this.activity = response.data))
+        .get(BASE_URL)
+        .then((response) => (activity.value = response.data))
         .catch((error) => console.log(error));
-    },
-    getFilteredActivity() {
-      this.previousActivity = this.activity;
+    }
+    function getFilteredActivity() {
+      previousActivity.value = activity.value;
       axios
-        .get("http://www.boredapi.com/api/activity/", {
+        .get(BASE_URL, {
           params: {
-            type: this.fromChild[0],
-            participants: this.fromChild[1],
-            minPrice: this.fromChild[2],
-            maxPrice: this.fromChild[3],
-            minAccessibility: this.fromChild[4],
-            maxAccessibility: this.fromChild[5],
+            type: filters.value.type,
+            participants: filters.value.participants,
+            minprice: filters.value.minPrice,
+            maxprice: filters.value.maxPrice,
+            minaccessibility: filters.value.minAccessibility,
+            maxaccessibility: filters.value.maxAccessibility,
           },
         })
-        .then((response) => (this.activity = response.data))
+        .then((response) => (activity.value = response.data))
         .catch((error) => console.log(error));
-    },
-    onFilterChange(value: []) {
-      this.fromChild = value;
-    },
-    getPreviousActivity() {
-      this.activity = this.previousActivity;
-    },
+    }
+    function handleFilterChange(filtersValues: Filters) {
+      filters.value = filtersValues;
+    }
+    function getPreviousActivity() {
+      activity.value = previousActivity.value;
+    }
+
+    onMounted(() => {
+      getActivity()
+    })
+
+    return {
+      activity,
+      previousActivity,
+      getActivity,
+      getFilteredActivity,
+      handleFilterChange,
+      getPreviousActivity,
+    }
   },
-});
+})
 </script>
 
 <style scoped></style>
