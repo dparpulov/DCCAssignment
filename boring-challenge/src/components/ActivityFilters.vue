@@ -57,9 +57,6 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import VueCompositionAPI from '@vue/composition-api'
-Vue.use(VueCompositionAPI)
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/antd.css";
 import { defineComponent, ref, onMounted } from "@vue/composition-api";
@@ -68,8 +65,8 @@ export default defineComponent({
   components: {
     VueSlider,
   },
-  setup(props,{ emit }) {
-    const types = ref([
+  setup(props, { emit }) {
+    const types = [
       { value: "", text: "All" },
       { value: "education", text: "Education" },
       { value: "recreational", text: "Recreational" },
@@ -80,7 +77,7 @@ export default defineComponent({
       { value: "relaxation", text: "Relaxation" },
       { value: "music", text: "Music" },
       { value: "busywork", text: "Busywork" },
-    ])
+    ];
     const selectedType = ref("");
     const participants = ref(1);
     const min = ref(0);
